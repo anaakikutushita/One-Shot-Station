@@ -36,6 +36,7 @@ typedef enum {
 	L,
 	R,
 	ZR,
+	PLUS,
 	NOTHING,
 	TRIGGERS
 } Buttons_t;
@@ -385,6 +386,10 @@ void GetNextReport(USB_JoystickReport_Input_t* const ReportData) {
 
 				case ZR:
 					ReportData->Button |= SWITCH_ZR;
+					break;
+
+				case PLUS:
+					ReportData->Button |= SWITCH_PLUS;
 					break;
 
 				case TRIGGERS:
