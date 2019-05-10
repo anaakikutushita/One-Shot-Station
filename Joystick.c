@@ -19,6 +19,7 @@ these buttons for our use.
 */
 
 #include "Joystick.h"
+#include <stdlib.h>
 
 typedef enum {
 	UP,
@@ -46,90 +47,187 @@ typedef struct {
 	uint16_t duration;
 } command; 
 
-static const command step[] = {
-	// コントローラ接続
-	{ NOTHING,  250 },
-	{ TRIGGERS,  20 },
-	{ NOTHING,  150 },
-	{ TRIGGERS,  20 },
-	{ NOTHING,  150 },
-	{ A,         20 },
-	{ NOTHING,  250 },
+static command *step;
 
-	// バツチー郡駅を1度以上クリア後、深海メトロの列車の中、NAMACO端末を開いていない状態からスタート
-    // 端末を開く。クリア後は最後にクリアした駅にカーソルが合っている
-	{ X,         20 }, 
-	{ NOTHING,   10 },
-	// 駅の詳細を開く
-	{ A,         20 },
-	{ NOTHING,   10 },
-	// 駅を決定
-	{ A,         20 },
-	// ロード画面なので長めに待機
-	{ NOTHING,  500 },
-	// ブキ決定（リッター4K）
-	{ A,         20 },
-	{ NOTHING,   40 },
-	// 改札まで前進
-	{ UP,        80 },
-	// NAMACOポイント支払い
-	{ A,         20 },
-	// スタート地点に到達するまで待機
-	{ NOTHING,  180 },
-	// 少しだけ左に視点をずらす。Rスティックの入力時間は実際にプログラムを走らせながら調整
-	// スティックを右に入力するか左に入力するかは、ノーマルカメラかリバースカメラかによって変更する
-	{ R_RIGHT,  0.8 },
-	// チャージ→発射
-	{ ZR,       177 },
-	// リザルトが出てメトロ車内に戻るまで待機
-	{ NOTHING,  670 }
-};
+void SetStep(void) {
+	command conn_controler[] = {
+		// コントローラ接続
+		{ NOTHING,  250 },
+		{ TRIGGERS,  20 },
+		{ NOTHING,  150 },
+		{ TRIGGERS,  20 },
+		{ NOTHING,  150 },
+		{ A,         20 },
+		{ NOTHING,  250 }
+	};
+	int len_conn = sizeof(conn_controler) / sizeof(conn_controler[0]);
 
-command goto_vending[] = {
-	// マップを開く
-	{ X,         20 }, 
-	{ NOTHING,   10 },
-	// 中央駅までカーソル移動
-	{ LEFT,      10 }, 
-	{ NOTHING,   20 },
-	{ DOWN,      10 }, 
-	{ NOTHING,   20 },
-	{ DOWN,      10 }, 
-	{ NOTHING,   20 },
-	{ RIGHT,     10 }, 
-	{ NOTHING,   20 },
-	{ RIGHT,     10 }, 
-	{ NOTHING,   20 },
-	{ DOWN,      10 }, 
-	{ NOTHING,   20 },
-	// 中央駅選択
-	{ A,         20 },
-	{ NOTHING,   20 },
-	{ A,         20 },
-	// ロード画面なので長めに待機
-	{ NOTHING,  500 },
-	// 前進
-	{ UP,        80 },
-	{ NOTHING,   20 },
-	// 右を向く
-	{ RIGHT,     15 },
-	{ NOTHING,   20 },
-	{ Y,         20 },
-	{ NOTHING,   20 },
-	// ロッカーにぶつかるまで前進
-	{ UP,       500 },
-	{ NOTHING,   20 },
-	// 左を向く
-	{ LEFT,      20 },
-	{ NOTHING,   20 },
-	{ Y,         20 },
-	{ NOTHING,   20 },
-	// 段ボールにぶつかるまで前進
-	{ UP,        50 }
-};
+	command clear_oneshot[] = {
+		// バツチー郡駅を1度以上クリア後、深海メトロの列車の中、NAMACO端末を開いていない状態からスタート
+		// 端末を開く。クリア後は最後にクリアした駅にカーソルが合っている
+		{ X,         20 }, 
+		{ NOTHING,   10 },
+		// 駅の詳細を開く
+		{ A,         20 },
+		{ NOTHING,   10 },
+		// 駅を決定
+		{ A,         20 },
+		// ロード画面なので長めに待機
+		{ NOTHING,  500 },
+		// ブキ決定（リッター4K）
+		{ A,         20 },
+		{ NOTHING,   40 },
+		// 改札まで前進
+		{ UP,        80 },
+		// NAMACOポイント支払い
+		{ A,         20 },
+		// スタート地点に到達するまで待機
+		{ NOTHING,  180 },
+		// 少しだけ左に視点をずらす。Rスティックの入力時間は実際にプログラムを走らせながら調整
+		// スティックを右に入力するか左に入力するかは、ノーマルカメラかリバースカメラかによって変更する
+		{ R_RIGHT,  0.8 },
+		// チャージ→発射
+		{ ZR,       177 },
+		// リザルトが出てメトロ車内に戻るまで待機
+		{ NOTHING,  670 }
+	};
+	int len_clear = sizeof(clear_oneshot) / sizeof(clear_oneshot[0]);
+
+	command goto_vending[] = {
+		// バツチー郡駅から自販機まで移動
+		// マップを開く
+		{ X,         20 }, 
+		{ NOTHING,   10 },
+		// 中央駅までカーソル移動
+		{ LEFT,      10 }, 
+		{ NOTHING,   20 },
+		{ DOWN,      10 }, 
+		{ NOTHING,   20 },
+		{ DOWN,      10 }, 
+		{ NOTHING,   20 },
+		{ RIGHT,     10 }, 
+		{ NOTHING,   20 },
+		{ RIGHT,     10 }, 
+		{ NOTHING,   20 },
+		{ DOWN,      10 }, 
+		{ NOTHING,   20 },
+		// 中央駅選択
+		{ A,         20 },
+		{ NOTHING,   20 },
+		{ A,         20 },
+		// ロード
+		{ NOTHING,  300 },
+		// 前進
+		{ UP,        80 },
+		{ NOTHING,   20 },
+		// 右を向く
+		{ RIGHT,     15 },
+		{ NOTHING,   20 },
+		{ Y,         20 },
+		{ NOTHING,   20 },
+		// ロッカーにぶつかるまで前進
+		{ UP,       400 },
+		{ NOTHING,   20 },
+		// 左を向く
+		{ LEFT,      20 },
+		{ NOTHING,   20 },
+		{ Y,         20 },
+		{ NOTHING,   20 },
+		// 段ボールにぶつかるまで前進
+		{ UP,        50 }
+	};
+	int len_goto_v = sizeof(goto_vending) / sizeof(goto_vending[0]);
+
+	command exchange[] = {
+		// ポイント交換
+		{ A,         20 },
+		{ NOTHING,   20 },
+		{ RIGHT,     20 },
+		{ NOTHING,   20 },
+		{ A,         20 },
+		{ NOTHING,  180 },
+		{ A,         20 },
+		{ NOTHING,   20 }
+	};
+	int len_exchange = sizeof(exchange) / sizeof(exchange[0]);
+
+	command goto_oneshot[] = {
+		// 中央駅からバツチー郡駅に移動
+		{ PLUS,      20 },
+		{ NOTHING,   20 },
+		{ DOWN,      20 },
+		{ NOTHING,   20 },
+		{ A,         20 },
+		{ NOTHING,  300 },
+		{ X,         20 },
+		{ NOTHING,   20 },
+		{ UP,        10 },
+		{ NOTHING,   20 },
+		{ LEFT,      10 },
+		{ NOTHING,   20 },
+		{ LEFT,      10 },
+		{ NOTHING,   20 },
+		{ UP,        10 },
+		{ NOTHING,   20 },
+		{ UP,        10 },
+		{ NOTHING,   20 },
+		{ RIGHT,     10 },
+		{ NOTHING,   20 },
+		{ A,         20 },
+		{ NOTHING,   20 },
+		{ A,         20 },
+		{ NOTHING,  400 },
+		{ A,         20 },
+		{ NOTHING,   20 },
+		{ PLUS,      20 },
+		{ NOTHING,   20 },
+		{ DOWN,      20 },
+		{ NOTHING,   20 },
+		{ A,         20 },
+		{ NOTHING,  200 }
+	};
+	int len_goto_o = sizeof(goto_oneshot) / sizeof(goto_oneshot[0]);
+
+	int all_steps = len_conn + len_clear * 25 + len_goto_v + len_exchange * 1 + len_goto_o;
+
+	step = (int *)malloc(all_steps * sizeof(int));
+
+	int step_num = 0;
+
+	for (int i = 0; i < len_conn; i++) {
+		step[step_num] = conn_controler[i];
+		step_num++;
+	}
+
+	for (int repeat_num = 0; repeat_num < 25; repeat_num++) {
+		for (int i = 0; i < len_clear; i++) {
+			step[step_num] = clear_oneshot[i];
+			step_num++;
+		}
+	}
+
+	for (int i = 0; i < len_goto_v; i++) {
+		step[step_num] = goto_vending[i];
+		step_num++;
+	}
+
+	for (int repeat_num = 0; repeat_num < 1; repeat_num++) {
+		for (int i = 0; i < len_exchange; i++) {
+			step[step_num] = exchange[i];
+			step_num++;
+		}
+	}
+
+	for (int i = 0; i < len_goto_o; i++) {
+		step[step_num] = goto_oneshot[i];
+		step_num++;
+	}
+}
 
 // Main entry point.
 int main(void) {
+	SetStep();
+
 	// We'll start by performing hardware and peripheral setup.
 	SetupHardware();
 	// We'll then enable global interrupts for our use.
