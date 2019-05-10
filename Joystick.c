@@ -84,6 +84,49 @@ static const command step[] = {
 	{ NOTHING,  670 }
 };
 
+command goto_vending[] = {
+	// マップを開く
+	{ X,         20 }, 
+	{ NOTHING,   10 },
+	// 中央駅までカーソル移動
+	{ LEFT,      10 }, 
+	{ NOTHING,   20 },
+	{ DOWN,      10 }, 
+	{ NOTHING,   20 },
+	{ DOWN,      10 }, 
+	{ NOTHING,   20 },
+	{ RIGHT,     10 }, 
+	{ NOTHING,   20 },
+	{ RIGHT,     10 }, 
+	{ NOTHING,   20 },
+	{ DOWN,      10 }, 
+	{ NOTHING,   20 },
+	// 中央駅選択
+	{ A,         20 },
+	{ NOTHING,   20 },
+	{ A,         20 },
+	// ロード画面なので長めに待機
+	{ NOTHING,  500 },
+	// 前進
+	{ UP,        80 },
+	{ NOTHING,   20 },
+	// 右を向く
+	{ RIGHT,     15 },
+	{ NOTHING,   20 },
+	{ Y,         20 },
+	{ NOTHING,   20 },
+	// ロッカーにぶつかるまで前進
+	{ UP,       500 },
+	{ NOTHING,   20 },
+	// 左を向く
+	{ LEFT,      20 },
+	{ NOTHING,   20 },
+	{ Y,         20 },
+	{ NOTHING,   20 },
+	// 段ボールにぶつかるまで前進
+	{ UP,        50 }
+}
+
 // Main entry point.
 int main(void) {
 	// We'll start by performing hardware and peripheral setup.
