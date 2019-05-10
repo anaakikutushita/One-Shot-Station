@@ -37,6 +37,7 @@ typedef enum {
 	R,
 	ZR,
 	PLUS,
+	CAPTURE,
 	NOTHING,
 	TRIGGERS
 } Buttons_t;
@@ -484,6 +485,7 @@ static const command step[] = {
 	{ NOTHING,   20 },
 	{ A,         20 },
 	{ NOTHING,  180 },
+	{ CAPTURE,   10 },
 	{ A,         20 },
 	{ NOTHING,   20 },
 	
@@ -788,6 +790,10 @@ void GetNextReport(USB_JoystickReport_Input_t* const ReportData) {
 
 				case PLUS:
 					ReportData->Button |= SWITCH_PLUS;
+					break;
+
+				case CAPTURE:
+					ReportData->Button |= SWITCH_CAPTURE;
 					break;
 
 				case TRIGGERS:
