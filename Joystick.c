@@ -125,7 +125,7 @@ command goto_vending[] = {
 	{ NOTHING,   20 },
 	// 段ボールにぶつかるまで前進
 	{ UP,        50 }
-}
+};
 
 // Main entry point.
 int main(void) {
