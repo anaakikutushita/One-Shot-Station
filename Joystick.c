@@ -789,10 +789,6 @@ void GetNextReport(USB_JoystickReport_Input_t* const ReportData) {
 					ReportData->Button |= SWITCH_PLUS;
 					break;
 
-				case CAPTURE:
-					ReportData->Button |= SWITCH_CAPTURE;
-					break;
-
 				case TRIGGERS:
 					ReportData->Button |= SWITCH_L | SWITCH_R;
 					break;
